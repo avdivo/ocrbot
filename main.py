@@ -16,15 +16,18 @@ dp.include_router(router)
 
 app = web.Application()
 
+
 async def on_startup(app):
     webhook_info = await bot.get_webhook_info()
     if webhook_info.url != Config.WEBHOOK_URL:
         await bot.set_webhook(Config.WEBHOOK_URL)
     logging.info(f"Webhook set to URL: {Config.WEBHOOK_URL}")
 
+
 async def on_shutdown(app):
     await bot.delete_webhook()
     await dp.storage.close()
+
 
 if __name__ == '__main__':
     register_handlers(router)
