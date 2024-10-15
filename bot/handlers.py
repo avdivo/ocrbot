@@ -24,9 +24,15 @@ async def help_command(message: types.Message):
 
 
 async def language_command(message: types.Message):
-    return
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.add("English", "Русский", "中文")
+    # return
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=[
+            [types.KeyboardButton(text="English"),
+             types.KeyboardButton(text="Русский"),
+             types.KeyboardButton(text="中文")]
+        ],
+        resize_keyboard=True
+    )
     await message.reply("Выберите язык для распознавания:", reply_markup=keyboard)
     await UserState.waiting_for_language.set()
 
