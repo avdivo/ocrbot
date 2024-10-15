@@ -1,11 +1,8 @@
 version: '3'
-
 services:
   bot:
     build: .
     env_file:
       - .env
     ports:
-      - "${WEBAPP_PORT}:${WEBAPP_PORT}"
-    volumes:
-      - .:/app
+      - "8080:8080"  # ngrok перенаправляет на этот порт

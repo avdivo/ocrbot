@@ -1,4 +1,11 @@
-FROM python:3.9-slim
+FROM python:3.11-slim
+
+# Установить системные зависимости, включая OpenGL и libgomp
+RUN apt-get update && apt-get install -y \
+    libgomp1 \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

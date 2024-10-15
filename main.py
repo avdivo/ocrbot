@@ -6,7 +6,7 @@ from config import Config
 from bot.handlers import register_handlers
 from web.routes import setup_routes
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)  # Лог файл не создается, логи выводятся в консоль
 
 bot = Bot(token=Config.BOT_TOKEN)
 router = Router()
