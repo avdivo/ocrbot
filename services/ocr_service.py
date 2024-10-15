@@ -5,12 +5,11 @@ class OCRService:
         self.lang = 'ru'
         self.ocr = None
 
-    async def recognize_text(self, image_path, lang='en'):
+    async def recognize_text(self, image_path, lang='ru'):
         try:
             if not self.ocr or self.lang != lang:
                 self.lang = lang
                 self.ocr = PaddleOCR(use_angle_cls=True, lang=self.lang)
-            print(self.lang, '------------------------------------------')
             result = self.ocr.ocr(image_path, cls=True)
 
             text_lines = []

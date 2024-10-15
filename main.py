@@ -25,7 +25,6 @@ async def on_startup(app):
 async def on_shutdown(app):
     await bot.delete_webhook()
     await dp.storage.close()
-    await dp.storage.wait_closed()
 
 if __name__ == '__main__':
     register_handlers(router)

@@ -23,8 +23,7 @@ async def help_command(message: types.Message):
     await message.reply(help_text)
 
 
-async def language_command(message: types.Message):
-    # return
+async def language_command(message: types.Message, state: FSMContext):
     keyboard = types.ReplyKeyboardMarkup(
         keyboard=[
             [types.KeyboardButton(text="English"),
@@ -34,7 +33,7 @@ async def language_command(message: types.Message):
         resize_keyboard=True
     )
     await message.reply("Выберите язык для распознавания:", reply_markup=keyboard)
-    await UserState.waiting_for_language.set()
+    await state.set_state(UserState.waiting_for_language)  # Установка состояния
 
 
 async def process_language_selection(message: types.Message, state: FSMContext):
@@ -42,18 +41,16 @@ async def process_language_selection(message: types.Message, state: FSMContext):
     lang_map = {"english": "en", "русский": "ru", "中文": "ch"}
 
     if language in lang_map:
+        await state.clear()
         await state.update_data(language=lang_map[language])
         await message.reply(f"Язык распознавания установлен: {message.text}", reply_markup=types.ReplyKeyboardRemove())
     else:
         await message.reply("Пожалуйста, выберите язык из предложенных вариантов.")
 
-    await state.finish()
-
 
 async def process_image(message: types.Message, state: FSMContext):
     if message.photo:
         user_data = await state.get_data()
-        print(user_data)
         lang = user_data.get('language', 'ru')
 
         file_id = message.photo[-1].file_id
@@ -66,7 +63,7 @@ async def process_image(message: types.Message, state: FSMContext):
         text = await ocr_service.recognize_text(download_path, lang)
 
         if text:
-            await message.reply(f"Распознанный текст:\n\n{text}")
+            await message.reply(f"Язык распознавания {lang}\nРаспознанный текст:\n\n{text}")
         else:
             await message.reply("Не удалось распознать текст на изображении.")
 
