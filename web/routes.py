@@ -7,6 +7,19 @@ from config import Config
 async def webhook_handler(request):
     """Обработка запросов. Передача боту.
     """
+
+    # Получение информации о запросе
+    method = request.method  # HTTP метод (GET, POST и т.д.)
+    url = request.url  # Полный URL запроса
+    headers = request.headers  # Заголовки запроса
+    body = await request.text()  # Тело запроса (в виде строки)
+
+    # Логирование информации
+    print(f"Method: {method}")
+    print(f"URL: {url}")
+    print(f"Headers: {headers}")
+    print(f"Body: {body}")
+
     bot = request.app['bot']
     dispatcher = request.app['dispatcher']
 
