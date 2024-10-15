@@ -6,9 +6,32 @@ from services.ocr_service import ocr_service
 from bot.states import UserState
 
 
-async def start_command(message: types.Message):
-    await message.reply(
-        "Привет! Я бот для распознавания текста на изображениях. Отправь мне изображение, и я попробую распознать текст.")
+async def show_main_menu(message: types.Message, state: FSMContext):
+    user_data = await state.get_data()
+    current_language = user_data.get('language', 'ru')  # Значение по умолчанию
+
+    keyboard = types.ReplyKeyboardMarkup(
+        keyboard=[
+            [types.KeyboardButton(text="Выбрать фото"),
+             types.KeyboardButton(text=f"Сменить язык ({current_language})"),
+            ]
+        ],
+        resize_keyboard=True
+    )
+
+    await message.reply("Добро пожаловать! Выберите опцию:", reply_markup=keyboard)
+
+
+async def handle_main_menu(message: types.Message, state: FSMContext):
+    if message.text == "Выбрать фото":
+        await message.reply("Пожалуйста, отправьте изображение.")
+    elif message.text.startswith("Сменить язык"):
+        await language_command(message, state)
+
+
+async def start_command(message: types.Message, state: FSMContext):
+    await state.clear()  # Сброс состояния при старте
+    await show_main_menu(message, state)
 
 
 async def help_command(message: types.Message):
@@ -44,8 +67,10 @@ async def process_language_selection(message: types.Message, state: FSMContext):
         await state.clear()
         await state.update_data(language=lang_map[language])
         await message.reply(f"Язык распознавания установлен: {message.text}", reply_markup=types.ReplyKeyboardRemove())
+        await show_main_menu(message, state)  # Вернуть главное меню после выбора языка
     else:
         await message.reply("Пожалуйста, выберите язык из предложенных вариантов.")
+
 
 
 async def process_image(message: types.Message, state: FSMContext):
@@ -78,3 +103,4 @@ def register_handlers(router):
     router.message.register(language_command, Command(commands=['language']))
     router.message.register(process_language_selection, StateFilter(UserState.waiting_for_language))
     router.message.register(process_image, F.content_type == 'photo')
+    router.message.register(handle_main_menu, F.text.in_(["Выбрать фото", F.text.startswith("Сменить язык")]))
