@@ -28,7 +28,7 @@ async def language_command(message: types.Message, state: FSMContext):
         keyboard=[
             [types.KeyboardButton(text="English"),
              types.KeyboardButton(text="Русский"),
-             types.KeyboardButton(text="中文")]
+            ]
         ],
         resize_keyboard=True
     )
@@ -38,7 +38,7 @@ async def language_command(message: types.Message, state: FSMContext):
 
 async def process_language_selection(message: types.Message, state: FSMContext):
     language = message.text.lower()
-    lang_map = {"english": "en", "русский": "ru", "中文": "ch"}
+    lang_map = {"english": "en", "русский": "ru"}
 
     if language in lang_map:
         await state.clear()
