@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from aiogram import types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command, StateFilter
@@ -89,6 +90,14 @@ async def process_image(message: types.Message, state: FSMContext):
 
         if text:
             await message.reply(f"Язык распознавания {lang}\nРаспознанный текст:\n\n{text}")
+
+            # Сохранение распознанного текста в файл с именем, соответствующим ID пользователя
+            # Перед ним строка с текущей датой и временем и языком распознавания
+            insert = f"\n\nДата и время: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\nЯзык: {lang}\n"
+            path = os.path.join("data", "recognized_texts", f"{message.from_user.id}.txt")
+            with open(path, 'a', encoding='utf-8') as f:
+                f.write(insert + text)
+
         else:
             await message.reply("Не удалось распознать текст на изображении.")
 
