@@ -8,7 +8,6 @@ from fastapi import FastAPI, Request
 from config import Config
 from bot.handlers import register_handlers
 
-
 logging.basicConfig(level=logging.INFO)  # Лог файл не создается, логи выводятся в консоль
 
 bot = Bot(token=Config.BOT_TOKEN)
