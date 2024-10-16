@@ -154,8 +154,8 @@ async def process_image(message: types.Message, state: FSMContext):
 
         else:
             await message.reply("Не удалось распознать текст на изображении.")
-
-        os.remove(download_path)  # Удаление временного файла
+        if os.path.exists(download_path):
+            os.remove(download_path)  # Удаление временного файла
     else:
         await message.reply("Пожалуйста, отправьте изображение.")
 
