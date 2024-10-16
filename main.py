@@ -3,7 +3,7 @@ from aiogram import Bot, Dispatcher, Router
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import Update
 from fastapi.responses import JSONResponse
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 
 from config import Config
 from bot.handlers import register_handlers
@@ -38,10 +38,11 @@ async def on_shutdown():
 
 # Обработка вебхуков
 @app.post(Config.WEBHOOK_PATH)
-async def webhook_handler(request):
+async def webhook_handler(request: Request):
     """Обработка запросов. Передача боту.
     """
-    update = Update(**await request.json())  # Создание объекта обновления
+    update_data = await request.json()  # Получение данных из запроса
+    update = Update(**update_data)  # Создание объекта обновления
     await dp.feed_update(bot, update)  # Передача обновления боту
     return JSONResponse(content={})  # Возвращение пустого ответа
 
