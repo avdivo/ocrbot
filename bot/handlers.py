@@ -103,6 +103,9 @@ async def process_language_selection(message: types.Message, state: FSMContext):
     :param state:
     :return
     """
+    if not message.text:
+        return
+
     language = message.text.lower()
     lang_map = {"english": "en", "русский": "ru"}
 
