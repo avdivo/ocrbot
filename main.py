@@ -1,10 +1,9 @@
 import logging
 from aiogram import Bot, Dispatcher, Router
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiohttp import web
+from fastapi import FastAPI, Request
 from config import Config
 from bot.handlers import register_handlers
-from web.routes import setup_routes
 
 logging.basicConfig(level=logging.INFO)  # Лог файл не создается, логи выводятся в консоль
 
@@ -14,24 +13,25 @@ storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 dp.include_router(router)
 
-app = web.Application()
+app = FastAPI()
 
 
+@app.on_event("startup")
 async def on_startup(app):
+    """Установка вебхука при запуске приложения"""
     webhook_info = await bot.get_webhook_info()
     if webhook_info.url != Config.WEBHOOK_URL:
         await bot.set_webhook(Config.WEBHOOK_URL)
+    app.state.bot = bot  # Сохранение объекта бота в состоянии приложения
+    app.state.dp = dp  # Сохранение объекта диспетчера в состоянии приложения
     logging.info(f"Webhook set to URL: {Config.WEBHOOK_URL}")
 
 
-async def on_shutdown(app):
+@app.on_event("shutdown")
+async def on_shutdown():
+    """Удаление вебхука и закрытие хранилища при завершении работы приложения"""
     await bot.delete_webhook()
     await dp.storage.close()
 
 
-if __name__ == '__main__':
-    register_handlers(router)
-    setup_routes(app, bot, dp)
-    app.on_startup.append(on_startup)
-    app.on_shutdown.append(on_shutdown)
-    web.run_app(app, host=Config.WEBAPP_HOST, port=Config.WEBAPP_PORT)
+register_handlers(router)
