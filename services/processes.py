@@ -12,7 +12,7 @@ def _worker_load_models(lang_map):
     """
     try:
         print(f"Загрузка {len(lang_map)} моделей OCR в PID {os.getpid()}")
-        print(f"Языки для загрузки: {' ,'.join(lang_map.keys())}")
+        print(f"Языки для загрузки: {', '.join(lang_map.keys())}")
         global OCR_OBJECTS
         OCR_OBJECTS = {}
         for lang, lang_code in lang_map.items():

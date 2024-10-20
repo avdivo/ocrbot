@@ -38,6 +38,8 @@ async def handle_main_menu(message: types.Message, state: FSMContext):
     :param state:
     :return
     """
+    if not message.text:
+        return
     if message.text == "Посмотреть историю":
         # Читаем файл с именем по id пользователя и отправляем содержимое пользователю
         bot = message.bot  # Получение объекта бота из сообщения
