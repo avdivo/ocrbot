@@ -20,8 +20,8 @@ class OcrService:
         # делаем это заранее, до начала работы сервиса
         # Инициализация загрузки моделей в каждом процессе
         futures = [self.executor.submit(_worker_load_models, self.LANG_MAP) for _ in range(cpu_count)]
-        for future in futures:
-            future.result()  # Ожидание завершения загрузки моделей
+        # for future in futures:
+        #     future.result()  # Ожидание завершения загрузки моделей
         print('------------------ Модели загружены --------------------')
 
     async def recognize_text(self, image_path, lang):
