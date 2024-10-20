@@ -1,14 +1,30 @@
-from paddleocr import PaddleOCR
+import asyncio
+from functools import partial
+from .processes import _worker_load_models, _worker_process_recognition
+from concurrent.futures import ProcessPoolExecutor
 
 
-class OCRService:
+class OcrService:
     """Сервис для распознавания текста на изображениях
     """
-    def __init__(self):
-        self.lang = 'ru'  # Язык по умолчанию
-        self.ocr = None  # Объект OCR
+    # Словарь с соответствием языков и кодов для PaddleOCR, а также объектов OCR
+    LANG_MAP = {"English": "en", "Русский": "ru"}
 
-    async def recognize_text(self, image_path, lang='ru'):
+    def __init__(self):
+        self.lang = 'Русский'  # Язык по умолчанию
+        cpu_count = 2 # os.cpu_count() or 2  # Определение количества ядер CPU
+        self.executor = ProcessPoolExecutor(max_workers=cpu_count)
+
+        print(f'------------------ Загрузка моделей распознавания для {cpu_count} процессов --------------------')
+        # Загрузка занимает много времени, поэтому чтобы не загружать при распознавании
+        # делаем это заранее, до начала работы сервиса
+        # Инициализация загрузки моделей в каждом процессе
+        futures = [self.executor.submit(_worker_load_models, self.LANG_MAP) for _ in range(cpu_count)]
+        for future in futures:
+            future.result()  # Ожидание завершения загрузки моделей
+        print('------------------ Модели загружены --------------------')
+
+    async def recognize_text(self, image_path, lang):
         """Распознавание текста на изображении
         :param image_path: Путь к изображению
         :param lang: Язык распознавания
@@ -16,23 +32,22 @@ class OCRService:
         :return: Распознанный текст
         """
         try:
-            if not self.ocr or self.lang != lang:
-                # Если объект OCR не создан или язык изменился
-                self.lang = lang
-                self.ocr = PaddleOCR(use_angle_cls=True, lang=self.lang)
-            result = self.ocr.ocr(image_path, cls=True)
-
-            # Преобразуем результат в текст
-            text_lines = []
-            for line in result:
-                line_text = " ".join([word_info[1][0] for word_info in line])  # Объединяем слова в строку
-                text_lines.append(line_text)  # Добавляем строку в список
-
-            return "\n".join(text_lines)  # Объединяем строки с переносом
+            # Распознавание текста на изображении в пуле потоков
+            loop = asyncio.get_running_loop()
+            text = await loop.run_in_executor(
+                self.executor,
+                partial(_worker_process_recognition, image_path, lang)
+            )
+            return text
 
         except Exception as e:
-            print(f"Error in OCR processing: {e}")
+            print(f"Ошибка при распознавании: {e}")
             return None
 
+    def shutdown_executor(self):
+        """Завершение пула процессов"""
+        print('------------------ Завершение работы пула процессов --------------------')
+        self.executor.shutdown(wait=True)
 
-ocr_service = OCRService()  # Создаем экземпляр сервиса
+
+ocr_service = OcrService()

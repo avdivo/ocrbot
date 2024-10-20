@@ -3,8 +3,10 @@ from datetime import datetime
 from aiogram import types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command, StateFilter
+
 from services.ocr_service import ocr_service
 from bot.states import UserState
+from services.ocr_service import ocr_service
 
 
 async def show_main_menu(message: types.Message, state: FSMContext):
@@ -85,11 +87,10 @@ async def language_command(message: types.Message, state: FSMContext):
     :param state:
     :return:
     """
+    langs = [types.KeyboardButton(text=lang) for lang in ocr_service.LANG_MAP.keys()]
     keyboard = types.ReplyKeyboardMarkup(
         keyboard=[
-            [types.KeyboardButton(text="English"),
-             types.KeyboardButton(text="Русский"),
-             ]
+            langs
         ],
         resize_keyboard=True
     )
@@ -106,13 +107,13 @@ async def process_language_selection(message: types.Message, state: FSMContext):
     if not message.text:
         return
 
-    language = message.text.lower()
-    lang_map = {"english": "en", "русский": "ru"}
+    language = message.text
+    lang_map = ocr_service.LANG_MAP
 
     if language in lang_map:
         # Сохранение выбранного языка в данных пользователя
         await state.clear()
-        await state.update_data(language=lang_map[language])
+        await state.update_data(language=language)
         await message.reply(f"Язык распознавания установлен: {message.text}", reply_markup=types.ReplyKeyboardRemove())
         await show_main_menu(message, state)  # Вернуть главное меню после выбора языка
     else:
@@ -128,7 +129,9 @@ async def process_image(message: types.Message, state: FSMContext):
     if message.photo:
         # Получение данных пользователя из состояния
         user_data = await state.get_data()
-        lang = user_data.get('language', 'ru')
+        lang = user_data.get('language')
+        if not lang:
+            lang = ocr_service.lang
 
         # Получение пути к файлу изображения и его загрузка
         file_id = message.photo[-1].file_id

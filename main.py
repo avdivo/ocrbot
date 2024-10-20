@@ -7,6 +7,8 @@ from fastapi import FastAPI, Request
 
 from config import Config
 from bot.handlers import register_handlers
+from services.ocr_service import ocr_service
+
 
 logging.basicConfig(level=logging.INFO)  # Лог файл не создается, логи выводятся в консоль
 
@@ -33,6 +35,7 @@ async def on_shutdown():
     """Удаление вебхука и закрытие хранилища при завершении работы приложения"""
     await bot.delete_webhook()
     await dp.storage.close()
+    ocr_service.shutdown_executor()  # Завершение пула процессов
 
 
 # Обработка вебхуков
