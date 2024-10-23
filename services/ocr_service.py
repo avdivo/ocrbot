@@ -19,7 +19,10 @@ class OcrService:
         # Загрузка занимает много времени, поэтому чтобы не загружать при распознавании
         # делаем это заранее, до начала работы сервиса
         # Инициализация загрузки моделей в каждом процессе
-        futures = [self.executor.submit(_worker_load_models, self.LANG_MAP) for _ in range(cpu_count)]
+        # futures = [self.executor.submit(_worker_load_models, self.LANG_MAP) for _ in range(cpu_count)]
+        self.executor = ProcessPoolExecutor(max_workers=cpu_count, initializer=_worker_load_models,
+                                 initargs=(self.LANG_MAP,))
+
         # for future in futures:
         #     future.result()  # Ожидание завершения загрузки моделей
         print('------------------ Модели загружены --------------------')

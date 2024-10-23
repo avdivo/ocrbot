@@ -9,17 +9,16 @@ from config import Config
 from bot.handlers import register_handlers
 from services.ocr_service import ocr_service
 
-
 logging.basicConfig(level=logging.INFO)  # Лог файл не создается, логи выводятся в консоль
 
 bot = Bot(token=Config.BOT_TOKEN)
 router = Router()
+register_handlers(router)
 storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 dp.include_router(router)
 
 app = FastAPI()
-
 
 @app.on_event("startup")
 async def on_startup():
@@ -48,5 +47,6 @@ async def webhook_handler(request: Request):
     await dp.feed_update(bot, update)  # Передача обновления боту
     return JSONResponse(content={})  # Возвращение пустого ответа
 
+if __name__ == "__main__":
+    app = FastAPI()
 
-register_handlers(router)

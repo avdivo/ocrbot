@@ -4,7 +4,6 @@ from aiogram import types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command, StateFilter
 
-from services.ocr_service import ocr_service
 from bot.states import UserState
 from services.ocr_service import ocr_service
 

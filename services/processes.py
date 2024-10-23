@@ -31,7 +31,7 @@ def _worker_process_recognition(image_path, lang) -> str:
     :return: Результат OCR в виде текста
     """
     if lang not in OCR_OBJECTS:
-        raise ValueError("Модель OCR не загружена для указанного языка")
+        raise ValueError(f"Модель OCR не загружена для указанного языка {OCR_OBJECTS, lang}")
 
     try:
         ocr = OCR_OBJECTS[lang]
