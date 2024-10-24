@@ -12,7 +12,7 @@ class OcrService:
 
     def __init__(self):
         self.lang = 'Русский'  # Язык по умолчанию
-        cpu_count = 2 # os.cpu_count() or 2  # Определение количества ядер CPU
+        cpu_count = 2  # os.cpu_count() or 2  # Определение количества ядер CPU
         self.executor = ProcessPoolExecutor(max_workers=cpu_count)
 
         print(f'------------------ Загрузка моделей распознавания для {cpu_count} процессов --------------------')
@@ -21,7 +21,7 @@ class OcrService:
         # Инициализация загрузки моделей в каждом процессе
         # futures = [self.executor.submit(_worker_load_models, self.LANG_MAP) for _ in range(cpu_count)]
         self.executor = ProcessPoolExecutor(max_workers=cpu_count, initializer=_worker_load_models,
-                                 initargs=(self.LANG_MAP,))
+                                            initargs=(self.LANG_MAP,))
 
         # for future in futures:
         #     future.result()  # Ожидание завершения загрузки моделей

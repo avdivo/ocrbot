@@ -1,4 +1,5 @@
 import os
+import asyncio
 from datetime import datetime
 from aiogram import types, F
 from aiogram.fsm.context import FSMContext
@@ -172,6 +173,7 @@ def register_handlers(router):
     router.message.register(start_command, Command(commands=['start']))
     router.message.register(help_command, Command(commands=['help']))
     router.message.register(language_command, Command(commands=['language']))
-    router.message.register(process_language_selection, StateFilter(UserState.waiting_for_language))  # Фильтр по состоянию
+    router.message.register(process_language_selection,
+                            StateFilter(UserState.waiting_for_language))  # Фильтр по состоянию
     router.message.register(process_image, F.content_type == 'photo')
     router.message.register(handle_main_menu, F.text.in_(["Выбрать фото", F.text.startswith("Сменить язык")]))

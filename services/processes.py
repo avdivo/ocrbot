@@ -17,11 +17,11 @@ def _worker_load_models(lang_map):
         OCR_OBJECTS = {}
         for lang, lang_code in lang_map.items():
             OCR_OBJECTS[lang] = PaddleOCR(use_angle_cls=True, lang=lang_code)
-        import time
-        time.sleep(10)
+
     except Exception as e:
         print(f"Ошибка при загрузке модели: {e}")
         raise
+
 
 def _worker_process_recognition(image_path, lang) -> str:
     """Выполнение распознавания в отдельном процессе
@@ -36,6 +36,9 @@ def _worker_process_recognition(image_path, lang) -> str:
     try:
         ocr = OCR_OBJECTS[lang]
         result = ocr.ocr(image_path, True)
+
+        import time
+        time.sleep(30)
 
         # Преобразуем результат в текст
         text_lines = []

@@ -1,4 +1,5 @@
 import logging
+import asyncio
 from aiogram import Bot, Dispatcher, Router
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import Update
@@ -19,6 +20,7 @@ dp = Dispatcher(storage=storage)
 dp.include_router(router)
 
 app = FastAPI()
+
 
 @app.on_event("startup")
 async def on_startup():
@@ -44,9 +46,9 @@ async def webhook_handler(request: Request):
     """
     update_data = await request.json()  # Получение данных из запроса
     update = Update(**update_data)  # Создание объекта обновления
-    await dp.feed_update(bot, update)  # Передача обновления боту
+    asyncio.create_task(dp.feed_update(bot, update))  # Передача обновления боту
     return JSONResponse(content={})  # Возвращение пустого ответа
+
 
 if __name__ == "__main__":
     app = FastAPI()
-
