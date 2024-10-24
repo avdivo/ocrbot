@@ -1,4 +1,5 @@
 import os
+import uuid
 from datetime import datetime
 from aiogram import types, F
 from aiogram.fsm.context import FSMContext
@@ -139,7 +140,8 @@ async def process_image(message: types.Message, state: FSMContext):
         file = await message.bot.get_file(file_id)
         file_path = file.file_path
 
-        download_path = f"temp_{message.from_user.id}.jpg"
+        # В качестве имени файла генерируем uuid
+        download_path = f"temp_{message.from_user.id}_{uuid.uuid4()}.jpg"
         await message.bot.download_file(file_path, destination=download_path)
 
         # Распознавание текста на изображении

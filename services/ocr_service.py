@@ -1,3 +1,4 @@
+import os
 import asyncio
 from functools import partial
 from .processes import _worker_load_models, _worker_process_recognition
@@ -35,6 +36,8 @@ class OcrService:
         :return: Распознанный текст
         """
         try:
+            if not os.path.exists(image_path):
+                return None
             # Распознавание текста на изображении в пуле потоков
             loop = asyncio.get_running_loop()
             text = await loop.run_in_executor(
