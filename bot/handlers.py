@@ -16,7 +16,7 @@ async def show_main_menu(message: types.Message, state: FSMContext):
     :return:
     """
     user_data = await state.get_data()  # Получение данных пользователя из состояния
-    current_language = user_data.get('language', 'ru')  # Значение по умолчанию
+    current_language = user_data.get('language', 'Русский')  # Значение по умолчанию
 
     # Создание клавиатуры
     keyboard = types.ReplyKeyboardMarkup(
