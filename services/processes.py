@@ -37,9 +37,6 @@ def _worker_process_recognition(image_path, lang) -> str:
         ocr = OCR_OBJECTS[lang]
         result = ocr.ocr(image_path, True)
 
-        import time
-        time.sleep(30)
-
         # Преобразуем результат в текст
         text_lines = []
         for line in result:
