@@ -1,5 +1,4 @@
 import os
-import asyncio
 from datetime import datetime
 from aiogram import types, F
 from aiogram.fsm.context import FSMContext
